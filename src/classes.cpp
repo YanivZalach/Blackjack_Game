@@ -1,124 +1,143 @@
+// Includes
+#include <cstddef>
 #include <iostream>
+#include <memory>
+#include <string>
 #include <vector>
-#include "classes.h"
-#include <cmath>//for abs
-#include <algorithm>//for srinking the vector to his uniqe values
+#include <cmath>  // For using 'abs'
+#include <algorithm>  // For shrinking the vector to his unique values
 
-//makeing the list to conting only uniqe values
-//This effectively reduces the container size by the number of elements removed, which are destroyed.
+#include "classes.h"
+
+// --------- Player Score ---------
+/*
+	Function to calculate all the player possible scores (For the `A` card)
+	This effectively reduces the container size by the number of elements removed, which are destroyed.
+*/
 void uniqeValuesOnlyVector(std::vector<int>& sums) {
-    // sort followed by unique, to remove all duplicates
+	// Sorting the vector
     std::sort(sums.begin(), sums.end());
+	// Removing duplicates
     auto last = std::unique(sums.begin(), sums.end());
+	// Resizing the vector for it's new size
     sums.erase(last, sums.end());
 }
 
+// --------- Card Value ---------
+// Function to get the true value of the card - for printing
+std::string TrueValueCard(const std::unique_ptr<Card>& card){
+	if(card->symbol=='T'){
+		// T symbols 10, using 1 char
+		return "10";
+	}
+	// Convert the card symbol to a string and return
+    return std::string(1, card->symbol);
+}
 
-//constracter
+
+// --------- Player Class ---------
+// Constructor
 Player::Player(){
     this->sums = {0};// Initialize sums with 0 to start the game
 };
 
-
-// Method to print all the cards the user has
-void Player::printCards(){
-    std::cout<<std::endl;
-    //printing all the cardes the user has
-    if(!this->cards.empty())
-    {
-        for(auto i =this->cards.begin();i!=this->cards.end();i++){
-            // Display the symbols of the cards
-            if(i->symbol=='T'){//T is a char that is signals the card 10, so this is what we print
-                std::cout <<" 10 ";
-            }
-            else{
-                std::cout <<" "<<i->symbol<<" ";
-            }
-        }
-    }
-    std::cout<<std::endl;
-}
-
-
-// Method to get all the sums of the player's card values
+// Getter to the sum
 std::vector<int>& Player::getSums(){
     //returning all the sums to work with
     return this->sums;
 }
 
+// Method to print ALL of the user cards
+void Player::printCards() {
+	std::cout << std::endl;  // New line
+
+	// Printing all the cards the user has
+	if (!this->cards.empty()) {
+		for (const std::unique_ptr<Card>& card : this->cards) {
+			// Display the symbols of the cards
+			std::string value = TrueValueCard(card);
+			std::cout << " " << value << " ";
+		}
+		std::cout << std::endl;  // New line
+	}
+}
+
+// Printing the opened cards
+void Player::printShowCard(){
+	std::cout << std::endl;  // New line
+
+    // Printing the show cards of the user
+	if (this->cards.size() > (cardsNotShown + 1)) {
+		for (size_t i = cardsNotShown; i < this->cards.size(); i++) {
+			// Display the symbols of the cards
+			std::string value = TrueValueCard(this->cards[i]);
+			std::cout << " " << value << " ";
+		}
+		std::cout << std::endl;  // New line
+	}
+}
+
+// Method to get the biggest sum
+int Player::maxSum(){
+     std::vector<int> sumsMaxSum = this->getSums();
+	 // Sorting for vector
+    std::sort(sumsMaxSum.begin(), sumsMaxSum.end()); 
+    //  If there is more then one we will find the max one
+	for (size_t i = sumsMaxSum.size() - 1 ; i > 0; i--) {
+        if(sumsMaxSum[i] <= 21){
+            return sumsMaxSum[i];
+        }
+	}
+    return sumsMaxSum[0];//the lowest one is more then 21 - we lost :(
+}
 
 // Method to add a new card to the player's hand
-void Player::addValueCard( Card cardIn){
+void Player::addValueCard( std::unique_ptr<Card>& cardIn){
+	// Adding the card to the player hand
     this->cards.push_back(cardIn);
+
+	// The vector of the sums
+     std::vector<int> sumsVector = this->getSums();
+
     // Update all the sums combinations
-    // is the card an A
-    bool isAese = (cardIn.symbol=='A');
-    //vector for case that the card is A
-    std::vector<int> forA;
-    //adding the value
-    for(auto i = this->sums.begin();i!=this->sums.end();i++){
+    bool isAese = (cardIn->symbol=='A');  // is the card an A?
+
+    std::vector<int> forA;  //vector for case that the card is A, added to the sums vector at the end of the function
+
+    //  Adding the value to the sum
+    for(size_t i = 0;i<sumsVector.size();i++){
         // Add the value of the new card to each sum
-        *i+=cardIn.values[0];
+		sumsVector[i]+=cardIn->values[0];
         if(isAese){
-            // If the new card is an Ace, it can have an additional value of 11, so we add 10 to the sum
-            forA.push_back(*i+10);
+            // If the new card is an Ace, it can have an additional value of 11, so we add 10 to the sum (11-1)
+            forA.push_back(sumsVector[i]+(cardIn->values[1]-cardIn->values[0]));
         }
     }
-    //adding in the case of A
+    //adding the 'forA' vector if created
     if(isAese){
-        //using the insert mathed
-        this->sums.insert(this->sums.end(),forA.begin(),forA.end());
+        //using the insert method
+        sumsVector.insert(sumsVector.end(),forA.begin(),forA.end());
     }
 
-    //removing doplicets
-    uniqeValuesOnlyVector(this->sums);
+    //removing duplicates for faster use
+    uniqeValuesOnlyVector(sumsVector);
 }
 
+// Did to here------------------------------- ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ----------------------------- 
 
-//Method to get the biggest sum
-int Player::maxSum(){//trying not to inclode above 21 -> is so we lost
-     std::vector<int> sumsMaxSum = this->getSums();
-    //making shore the vector of sums is order for more aficent code
-    std::sort(sumsMaxSum.begin(), sumsMaxSum.end()); 
-    //if there is more then one we will find the max one
-    for(auto i = std::prev(sumsMaxSum.end());i>=sumsMaxSum.begin();i--){//using std::prev(sumsMaxSum.end()) because we start at the leat elemet of the vector
-        if(*i<=21){
-            return *i;
-        }
-    }
-    return sumsMaxSum[0];//the lowes one - more then 21
-}
-
-//getting the card that is open by me
-const Card& Player::getShowCard(){
-    return *(this->cards.begin());
-}
-
-// Method to print all the cards the user has
-void Player::printShowCard(){
-    std::cout<<std::endl;
-    //printing the show card of the user
-    if(this->getShowCard().symbol=='T'){//T is a char that is signals the card 10, so this is what we print
-        std::cout <<" 10 ";
-    }
-    else{
-        std::cout <<" "<<this->getShowCard().symbol<<" ";
-    }
-    std::cout<<std::endl;
-}
 
 
 // Inherit from the Player class but add functionality to calculate whether to take a new card or not based on the dealer's cards
 // Using the constructor of the parent class
-Diler:: Diler():Player(){
-    this->calcTheRemaingPackDealerKnow = sumDeak;
+Dealer:: Dealer():Player(){
+    this->calcTheRemaingPackDealerKnow = sumDeck;
     // We are preparing for the worst case, where in the worst case, every Ace can be 1,
     // so we add 10*4 because of - 10, J, K, Q (four of each)
 };
 
 
 // Method to add a new card to the dealer's hand
-void Diler::addValueCardDiler( Card cardnt){
+void Dealer::addValueCardDiler( Card cardnt){
     // Subtract the value of the new card from the sum of remaining cards
     this->calcTheRemaingPackDealerKnow-=cardnt.values[0];
     // Add the new card to the dealer's hand using the base class method
@@ -127,7 +146,7 @@ void Diler::addValueCardDiler( Card cardnt){
 
          
 // Method to calculate the average card value in the deck
-int Diler::probCardValue(int enemyCardShow){
+int Dealer::probCardValue(int enemyCardShow){
         // Tif to take anther card or not
         // 1-yes,0-no,-1 - lost the game;
         int maxS=this->maxSum();
@@ -144,8 +163,8 @@ int Diler::probCardValue(int enemyCardShow){
             return -1;// We have already lost the game
         }
         // Check if the probability of getting a card that does not lead to busting is higher than the threshold
-        double avgCardValue  = (this->calcTheRemaingPackDealerKnow -enemyCardShow) / countDeak;
-        if((needMax/avgCardValue)>dillerLossHend){
+        double avgCardValue  = (this->calcTheRemaingPackDealerKnow -enemyCardShow) / countDeck;
+        if((needMax/avgCardValue)>dealerLossHend){
             return 1;// It is safe to take a new card
         }
         return 0;// It is risky to take a new card
