@@ -1,39 +1,34 @@
+// Includes
 #include <iostream>
+#include <memory>
 #include <vector>
-//game functinalty
+
+#include "classes.h"
 #include "game.h"
 
 
 int main() {
-    //the start of a new game after the first
-    bool antherRoundOfGame = false;
+
     do{
-        //clering the output
-        system("cls"); //for mac and linux:  system("clear");
+		clearConsole(); // Clearing the console
 
-        //creating a shfuld deak of cards
-        std::vector<Card> cards = shffelDeakOfCards();
+        // Creating a shuffled deck of cards
+        std::vector<std::unique_ptr<Card>> cards = shffelDeakOfCards();
 
-        //crating a dealer and a player
-        Diler dealer = Diler();
-        Player player = Player();
+        // Crating a dealer and a player as a shared pointer
+        std::shared_ptr<Dealer> dealer = std::make_shared<Dealer>();
+        std::shared_ptr<Player> player = std::make_shared<Player>();
 
-        //starting the game
-        startGame(player,dealer,cards);
+        startGame(player,dealer,cards);  // Starting the game
 
-        //printing info to the player
-        printGameStatus( player, dealer);
+        printGameStatus( player, dealer);  // Printing the game status
 
-        //taking anther card
+        // Taking anther card
         if(cardGameTake(player,dealer,cards)){
-            //if no resust we will show both
-            printEndGame(player,dealer);
+            printEndGame(player,dealer);  // If both not taking card - end game
         }
 
-        //playing agien?
-        antherRoundOfGame=antherRound();
-
-    }while(antherRoundOfGame);
+    }while(antherRound());  // Playing anther round?
 
     std::cout<<"Thanks for playing"<<std::endl;
 
