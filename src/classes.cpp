@@ -1,10 +1,7 @@
 // Includes
-#include <cstddef>
 #include <iostream>
-#include <memory>
-#include <string>
 #include <vector>
-#include <cmath>  // For using 'abs'
+#include <memory>
 #include <algorithm>  // For shrinking the vector to his unique values
 
 #include "classes.h"
@@ -47,6 +44,21 @@ std::vector<int>& Player::getSums(){
     return this->sums;
 }
 
+// Method to get reference to a vector that is containing all the currant player cards that are shown
+int Player::getShowCardsSum(){
+	// Creating a counter to sum all the show cards
+	int show_sum;
+
+	if (this->cards.size() > (CARDSNOTSHOWN+ 1)) { // We have cards to show?
+
+		for (size_t i = CARDSNOTSHOWN; i < this->cards.size(); i++) {
+			// Adding the cards value to sum, adding the `A` as 1(at location 0) for making 'takeCardDealer' based on this more accurate
+			show_sum+=(this->cards[i])->values[0];
+		}
+	}
+	return show_sum;
+}
+
 // Method to print ALL of the user cards
 void Player::printCards() {
 	std::cout << std::endl;  // New line
@@ -67,8 +79,8 @@ void Player::printShowCard(){
 	std::cout << std::endl;  // New line
 
     // Printing the show cards of the user
-	if (this->cards.size() > (cardsNotShown + 1)) {
-		for (size_t i = cardsNotShown; i < this->cards.size(); i++) {
+	if (this->cards.size() > (CARDSNOTSHOWN+ 1)) {
+		for (size_t i = CARDSNOTSHOWN; i < this->cards.size(); i++) {
 			// Display the symbols of the cards
 			std::string value = TrueValueCard(this->cards[i]);
 			std::cout << " " << value << " ";
@@ -79,94 +91,92 @@ void Player::printShowCard(){
 
 // Method to get the biggest sum
 int Player::maxSum(){
-     std::vector<int> sumsMaxSum = this->getSums();
+     std::vector<int> sums_max_sum = this->getSums();
 	 // Sorting for vector
-    std::sort(sumsMaxSum.begin(), sumsMaxSum.end()); 
+    std::sort(sums_max_sum.begin(), sums_max_sum.end()); 
     //  If there is more then one we will find the max one
-	for (size_t i = sumsMaxSum.size() - 1 ; i > 0; i--) {
-        if(sumsMaxSum[i] <= 21){
-            return sumsMaxSum[i];
+	for (size_t i = sums_max_sum.size() - 1 ; i > 0; i--) {
+        if(sums_max_sum[i] <= LOSTLIMIT){
+            return sums_max_sum[i];
         }
 	}
-    return sumsMaxSum[0];//the lowest one is more then 21 - we lost :(
+    return sums_max_sum[0];//the lowest one is more then 21 - we lost :(
 }
 
 // Method to add a new card to the player's hand
-void Player::addValueCard( std::unique_ptr<Card>& cardIn){
-	// Adding the card to the player hand
-    this->cards.push_back(cardIn);
+void Player::addValueCard( std::unique_ptr<Card>& card_in){
+	// Adding the card to the player hand - moving the pointer
+    this->cards.push_back( std::move(card_in));
 
 	// The vector of the sums
-     std::vector<int> sumsVector = this->getSums();
+     std::vector<int> sums_vector = this->getSums();
 
     // Update all the sums combinations
-    bool isAese = (cardIn->symbol=='A');  // is the card an A?
+    bool is_a = (card_in->symbol=='A');  // is the card an A?
 
-    std::vector<int> forA;  //vector for case that the card is A, added to the sums vector at the end of the function
+    std::vector<int> for_a;  //vector for case that the card is A, added to the sums vector at the end of the function
 
     //  Adding the value to the sum
-    for(size_t i = 0;i<sumsVector.size();i++){
+    for(size_t i = 0;i<sums_vector.size();i++){
         // Add the value of the new card to each sum
-		sumsVector[i]+=cardIn->values[0];
-        if(isAese){
+		sums_vector[i]+=card_in->values[0];
+        if(is_a){
             // If the new card is an Ace, it can have an additional value of 11, so we add 10 to the sum (11-1)
-            forA.push_back(sumsVector[i]+(cardIn->values[1]-cardIn->values[0]));
+            for_a.push_back(sums_vector[i]+(card_in->values[1]-card_in->values[0]));
         }
     }
-    //adding the 'forA' vector if created
-    if(isAese){
+    //adding the 'for_a' vector if created
+    if(is_a){
         //using the insert method
-        sumsVector.insert(sumsVector.end(),forA.begin(),forA.end());
+        sums_vector.insert(sums_vector.end(),for_a.begin(),for_a.end());
     }
 
     //removing duplicates for faster use
-    uniqeValuesOnlyVector(sumsVector);
+    uniqeValuesOnlyVector(sums_vector);
 }
 
-// Did to here------------------------------- ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ------------------------------ ----------------------------- 
-
-
-
-// Inherit from the Player class but add functionality to calculate whether to take a new card or not based on the dealer's cards
-// Using the constructor of the parent class
+// --------- Dealer Class ---------
+/*
+  Inherit from the Player class.
+  Add functionality: take a new card or not based on the dealer's cards
+*/
 Dealer:: Dealer():Player(){
-    this->calcTheRemaingPackDealerKnow = sumDeck;
-    // We are preparing for the worst case, where in the worst case, every Ace can be 1,
-    // so we add 10*4 because of - 10, J, K, Q (four of each)
+    this->count_remaining_cards = SUMDECK;  // A const in the `.h` file
 };
 
 
 // Method to add a new card to the dealer's hand
-void Dealer::addValueCardDiler( Card cardnt){
-    // Subtract the value of the new card from the sum of remaining cards
-    this->calcTheRemaingPackDealerKnow-=cardnt.values[0];
-    // Add the new card to the dealer's hand using the base class method
-    addValueCard(cardnt);
+void Dealer::addValueDealer( std::unique_ptr<Card>& card_in){
+    // Subtract the value of the new card from the sum of remaining cards to the eyes of the dealer
+    this->count_remaining_cards-=card_in->values[0];
+    // Add the new card to the dealer's hand using the addValueCard method of the player class
+    addValueCard(card_in);
 }
 
-         
 // Method to calculate the average card value in the deck
-int Dealer::probCardValue(int enemyCardShow){
-        // Tif to take anther card or not
-        // 1-yes,0-no,-1 - lost the game;
-        int maxS=this->maxSum();
-        if(maxS<=lowLimit){
-            return 1;// It's safe to take a new card
-        }
-        else if(maxS>=highLimit){
-            return 0;// It's risky to take a new card
-        }
-        //else
-        // Calculate the maximum needed card value to reach lostLimit without busting
-        double needMax =lostLimit- maxS;
-        if(needMax<0){
-            return -1;// We have already lost the game
-        }
-        // Check if the probability of getting a card that does not lead to busting is higher than the threshold
-        double avgCardValue  = (this->calcTheRemaingPackDealerKnow -enemyCardShow) / countDeck;
-        if((needMax/avgCardValue)>dealerLossHend){
-            return 1;// It is safe to take a new card
-        }
-        return 0;// It is risky to take a new card
-}
+bool Dealer::takeCardDealer(int enemy_card_show/*Player::getShowCardsSum()*/){
+        // Take anther card?
+        // Return: true - take, false - not take
 
+        int max_sum=this->maxSum();  // My max sum
+
+		// Based on the defined limit constants
+        if(max_sum <= LOWLIMIT){
+            return true;  // Take a new card
+        }else if(max_sum>=HIGHLIMIT){
+            return false;  // Don't take a new card
+        }
+
+        //else - based on the DEALERLOSSHEND constant
+        double need_max =LOSTLIMIT- max_sum;  // Calculate the maximum needed card value to reach LOSTLIMIT without busting
+        if(need_max<0){
+            return false;  // We have already lost the game
+        }
+        // Calculating the probability of getting a card that does not lead to busting is higher than the threshold
+        double avg_card_value  = (double)(this->count_remaining_cards -enemy_card_show) / COUNTDECK;
+
+        if((need_max/avg_card_value)>DEALERLOSSHEND){
+            return true;  // Take anther card
+        }
+        return false;  // Don't take anther card
+}

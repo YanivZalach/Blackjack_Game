@@ -1,12 +1,17 @@
 #pragma once
 
+// Includes
+#include <memory>
 #include <vector>
 #include "classes.h"
 
-const int numOfGroupsInDeak = 4;
+// Consts
+const int NUMOFGROUPSINDEAK = 4;
 
-std::vector<Card> crateDeakOfCards();
+// Creating the deck of cards - private to this file
+static std::vector<std::unique_ptr<Card>> crateDeakOfCards();
 
-std::vector<Card> shffelDeakOfCards();
+// Returning the deck of cards - Shuffled
+std::vector<std::unique_ptr<Card>> shffelDeakOfCards();
 
 
