@@ -49,7 +49,7 @@ int Player::getShowCardsSum(){
 	// Creating a counter to sum all the show cards
 	int show_sum;
 
-	if (this->cards.size() > (CARDSNOTSHOWN+ 1)) { // We have cards to show?
+	if (this->cards.size() > (CARDSNOTSHOWN)) { // We have cards to show?
 
 		for (size_t i = CARDSNOTSHOWN; i < this->cards.size(); i++) {
 			// Adding the cards value to sum, adding the `A` as 1(at location 0) for making 'takeCardDealer' based on this more accurate
@@ -79,7 +79,7 @@ void Player::printShowCard(){
 	std::cout << std::endl;  // New line
 
     // Printing the show cards of the user
-	if (this->cards.size() > (CARDSNOTSHOWN+ 1)) {
+	if (this->cards.size() > (CARDSNOTSHOWN)) {
 		for (size_t i = CARDSNOTSHOWN; i < this->cards.size(); i++) {
 			// Display the symbols of the cards
 			std::string value = TrueValueCard(this->cards[i]);
