@@ -75,7 +75,7 @@ class Player
 
         int maxSum();  // Method to get the biggest sum the player has
 
-		void addValueCard(std::unique_ptr<Card>& card_in);  // Method to add a new card to the player's hand
+		void addValueCard(std::unique_ptr<Card> card_in);  // Method to add a new card to the player's hand
 };
 
 // --------- Dealer Class ---------
@@ -90,6 +90,6 @@ class Dealer : public Player
 
 	public:
 		Dealer(); // Using the constructor of the parent class
-		void addValueDealer( std::unique_ptr<Card>& card_in);  // Method to add a new card to the dealer's hand
+		void addValueDealer( std::unique_ptr<Card> card_in);  // Method to add a new card to the dealer's hand
         bool takeCardDealer(int enemy_card_show);  // Method to calculate the average card value in the deck(0-dont take,1-take,-1-lost)
 };

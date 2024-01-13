@@ -1,4 +1,6 @@
 // Includes
+#include <algorithm>
+#include <cstddef>
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -9,11 +11,11 @@
 // Function to clear the console
 void clearConsole(){
 	// Clear the console - ANSI escape codes are supported by many terminal emulators, making them relatively portable.
-    std::cout << "\033[2J\033[H";
+	std::cout << "\033[2J\033[H";
 }
 
 // Printing the status of the game
-void printGameStatus(std::shared_ptr<Player>& player, std::shared_ptr<Dealer>& dealer) {
+void printGameStatus(Player *&player, Dealer *&dealer) {
 	clearConsole();  // Clearing the console
 
 	if (player) {
@@ -32,7 +34,7 @@ void printGameStatus(std::shared_ptr<Player>& player, std::shared_ptr<Dealer>& d
 
 
 // Printing the status in the end of the game
-void printEndGame(std::shared_ptr<Player>& player,std::shared_ptr<Dealer>& dealer){
+void printEndGame(Player *&player,Dealer *&dealer){
 
 	clearConsole();  // Clearing the console
 
@@ -62,124 +64,124 @@ void printEndGame(std::shared_ptr<Player>& player,std::shared_ptr<Dealer>& deale
 	}
 }
 
-//the opening of the game
-void startGame(std::shared_ptr<Player>& player,std::shared_ptr<Dealer>& dealer,std::vector<std::unique_ptr<Card>>& cards){
+// The opening of the game
+void startGame(Player *&player,Dealer *&dealer,std::vector<std::unique_ptr<Card>>& cards){
 
 	std::cout<<"STARTING THE GAME"<<std::endl;
 	std::cout<<"2 cardes for each, one open"<<std::endl;
+
 	for (size_t i = 0; i<OPENINGGAMECARDS; i++) {
-		dealer->addValueDealer(cards.back());  // Inserting the last element
-		cards.pop_back();  // Removing it
-		player->addValueCard(cards.back());
+		std::unique_ptr<Card> hold_player = std::move(cards.back());
 		cards.pop_back();
+		player->addValueCard(std::move(hold_player));
+
+		std::unique_ptr<Card> hold_dealer = std::move(cards.back());
+		cards.pop_back();  // Removing it
+		dealer->addValueDealer(std::move(hold_dealer));  // Inserting the last element
 	}
 	//addtimer
 }
 
 // Taking cards in the game rounds
-bool cardGameTake(std::shared_ptr<Player>& player,std::shared_ptr<Dealer>& dealer,std::vector<std::unique_ptr<Card>>& cards){
-    // If the player had ended to take cards
-    bool player_want_to_drow = true;
-    bool dealer_want_to_drow = true;
-    int i =0;//making shore we dont pass chackLimit
-    while ((player_want_to_drow||dealer_want_to_drow)&&(CHACKLIMIT>i))
-    {
-        if(gotBlackJack(player,dealer,cards)){
-            return false;
-        }
-        //printing the round
-        std::cout<<"Round "<<(i+3)<<std::endl;//i starts from 0, and we have 2 cards
-        if(player_want_to_drow ==true){
-            player_want_to_drow = playerDrow(player,cards);
-        }
-        if(dealer_want_to_drow ==true){
-            dealer_want_to_drow = dealerDrow(dealer, player,cards);
-        }
-        //time to read - addtimer
-        printGameStatus( player, dealer);
-        i++;//incresing i
-    }
-    return true;
+bool cardGameTake(Player *&player,Dealer *&dealer,std::vector<std::unique_ptr<Card>>& cards){
+	// If the player had ended to take cards
+	bool player_want_to_drow = true;
+	bool dealer_want_to_drow = true;
+	int i =0;//making shore we dont pass chackLimit
+	while ((player_want_to_drow||dealer_want_to_drow)&&(CHACKLIMIT>i))
+	{
+		if(gotBlackJack(player,dealer,cards)){
+			return false;
+		}
+		//printing the round
+		std::cout<<"Round "<<(i+3)<<std::endl;//i starts from 0, and we have 2 cards
+		if(player_want_to_drow ==true){
+			player_want_to_drow = playerDrow(player,cards);
+		}
+		if(dealer_want_to_drow ==true){
+			dealer_want_to_drow = dealerDrow(dealer, player,cards);
+		}
+		//time to read - addtimer
+		printGameStatus( player, dealer);
+		i++;//incresing i
+	}
+	return true;
 }
 
 // Player taking a card
-bool playerDrow(std::shared_ptr<Player>& player,std::vector<std::unique_ptr<Card>>& cards){
-    // Taking a card?
-    char input_take_card;
-    std::cout<<"Take anther card?"<<'\n'<<"(y=take/N=stop)"<<std::endl;
-    std::cin>>input_take_card;
+bool playerDrow(Player *&player,std::vector<std::unique_ptr<Card>>& cards){
+	// Taking a card?
+	char input_take_card;
+	std::cout<<"Take anther card?"<<'\n'<<"(y=take/N=stop)"<<std::endl;
+	std::cin>>input_take_card;
 
 	// Taking a card
-    if(input_take_card=='y'||input_take_card=='Y'){
-        player->addValueCard(cards.back());
-        cards.pop_back();
-        std::cout<<"You drow a card!"<<std::endl;
-        return true;
-    }
+	if(input_take_card=='y'||input_take_card=='Y'){
+		player->addValueCard(std::move(cards.back()));
+		cards.pop_back();
+		std::cout<<"You drow a card!"<<std::endl;
+		return true;
+	}
 
-    // Else - stop taking cards
-    std::cout<<"You stoped drowing!"<<std::endl;
-    return false;
+	// Else - stop taking cards
+	std::cout<<"You stoped drowing!"<<std::endl;
+	return false;
 }
 
 // Dealer taking a card
-bool dealerDrow(std::shared_ptr<Dealer>& dealer,std::shared_ptr<Player>& player,std::vector<std::unique_ptr<Card>>& cards){
-    // Taking a card?
-    bool dealer_take = dealer->takeCardDealer(player->getShowCardsSum());
+bool dealerDrow(Dealer *&dealer,Player *&player,std::vector<std::unique_ptr<Card>>& cards){
+	// Taking a card?
+	bool dealer_take = dealer->takeCardDealer(player->getShowCardsSum());
 
-    // Taking a card
-    if (dealer_take) {
-        std::cout<<"The dealer drow a card!"<<std::endl;
-        dealer->addValueDealer(cards.back());
-        cards.pop_back();
-        return true;
-    } 
-    // Else - not taking a card
-    std::cout<<"The dealer stoped drowing!"<<std::endl;
-    return false;
+	// Taking a card
+	if (dealer_take) {
+		std::cout<<"The dealer drow a card!"<<std::endl;
+		dealer->addValueDealer(std::move(cards.back()));
+		cards.pop_back();
+		return true;
+	} 
+	// Else - not taking a card
+	std::cout<<"The dealer stoped drowing!"<<std::endl;
+	return false;
 }
 
 // Did on the first round the player got blackjack?
-bool gotBlackJack(std::shared_ptr<Player>& player,std::shared_ptr<Dealer>& dealer,std::vector<std::unique_ptr<Card>>& cards){
-    // Both
-    if(dealer->maxSum()==LOSTLIMIT && player->maxSum()==LOSTLIMIT){
-        std::cout<<"WHIT!"<<std::endl;
+bool gotBlackJack(Player *&player,Dealer *&dealer,std::vector<std::unique_ptr<Card>>& cards){
+	// Both
+	if(dealer->maxSum()==LOSTLIMIT && player->maxSum()==LOSTLIMIT){
+		std::cout<<"WHIT!"<<std::endl;
 		// Addtimer
-        std::cout<<"YOU BOTH GOT A BLACKJACK!!!"<<std::endl;
-        return true;
-    }
-    // Player only
-    if(player->maxSum() == LOSTLIMIT){
-        std::cout<<"WHIT!"<<std::endl;
+		std::cout<<"YOU BOTH GOT A BLACKJACK!!!"<<std::endl;
+		return true;
+	}
+	// Player only
+	if(player->maxSum() == LOSTLIMIT){
+		std::cout<<"WHIT!"<<std::endl;
 		// addtimer
-        std::cout<<"YOU WIN, YOU GOT A BLACKJACK!!!"<<std::endl;
-        return true;
-    }
-    //dealer
-    if(dealer->maxSum()==LOSTLIMIT){
-        std::cout<<"WHIT!"<<std::endl;
+		std::cout<<"YOU WIN, YOU GOT A BLACKJACK!!!"<<std::endl;
+		return true;
+	}
+	//dealer
+	if(dealer->maxSum()==LOSTLIMIT){
+		std::cout<<"WHIT!"<<std::endl;
 		// Addtimer
-        std::cout<<"YOU LOST, THE DEALER GOT A BLACKJACK!!!"<<std::endl;
-         return true;
-    }
-    return false;
+		std::cout<<"YOU LOST, THE DEALER GOT A BLACKJACK!!!"<<std::endl;
+		return true;
+	}
+	return false;
 }
 
 
 //at the end of the game 
 bool antherRound(){
-    // A new game?
-    std::cout<<"Anther round(y/N)?"<<std::endl;
-    char run;
-    std::cin >> run;
+	// A new game?
+	std::cout<<"Anther round(y/N)?"<<std::endl;
+	char run;
+	std::cin >> run;
 	// A new game
-    if(run == 'y'|| run =='Y'){
-        return true;
-    }
+	if(run == 'y'|| run =='Y'){
+		return true;
+	}
 	// Exit the program
-    return false;
-}
-
-int main(){
-	return 0;
+	return false;
 }

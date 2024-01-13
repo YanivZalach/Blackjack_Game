@@ -9,7 +9,7 @@
 const int NUMOFGROUPSINDEAK = 4;
 
 // Creating the deck of cards - private to this file
-static std::vector<std::unique_ptr<Card>> crateDeakOfCards();
+std::vector<std::unique_ptr<Card>> crateDeakOfCards();
 
 // Returning the deck of cards - Shuffled
 std::vector<std::unique_ptr<Card>> shffelDeakOfCards();

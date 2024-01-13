@@ -7,7 +7,7 @@
 #include "classes.h"
 #include "data.h"
 
-static std::vector<std::unique_ptr<Card>> crateDeakOfCards(){
+std::vector<std::unique_ptr<Card>> crateDeakOfCards(){
 
     std::vector<std::unique_ptr<Card>> deak;
     for(int i = 0;i<NUMOFGROUPSINDEAK;i++){
@@ -35,7 +35,7 @@ std::vector<std::unique_ptr<Card>> shffelDeakOfCards(){
 	std::vector<std::unique_ptr<Card>> cardes = crateDeakOfCards();
 
   // Shuffle the deck of cards
-	for(int i =0;i<cardes.size();i++){
+	for(size_t i = 0;i<cardes.size();i++){
 		// Random index
 		int randomN = (rand()%cardes.size());
 		// Moving the current index with the random one

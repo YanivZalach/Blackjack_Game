@@ -25,25 +25,25 @@ const int SHORTSLEEP = 2000;
 void clearConsole();
 
 // Printing the status of the game
-void printGameStatus(std::shared_ptr<Player>& player,std::shared_ptr<Dealer>& dealer);
+void printGameStatus(Player *&player,Dealer *&dealer);
 
 // Printing the status in the end of the game
-void printEndGame(std::shared_ptr<Player>& player,std::shared_ptr<Dealer>& dealer);
+void printEndGame(Player *&player,Dealer *&dealer);
 
 // Starting the game, card handling
-void startGame(std::shared_ptr<Player>& player,std::shared_ptr<Dealer>& dealer,std::vector<std::unique_ptr<Card>>& cards);
+void startGame(Player *&player,Dealer *&dealer,std::vector<std::unique_ptr<Card>>& cards);
 
 // Taking cards in the game rounds
-bool cardGameTake(std::shared_ptr<Player>& player,std::shared_ptr<Dealer>& dealer,std::vector<std::unique_ptr<Card>>& cards);
+bool cardGameTake(Player *&player,Dealer *&dealer,std::vector<std::unique_ptr<Card>>& cards);
 
 // Player taking a card
-bool playerDrow(std::shared_ptr<Player>& player,std::vector<std::unique_ptr<Card>>& cards);
+bool playerDrow(Player *&player,std::vector<std::unique_ptr<Card>>& cards);
 
 // Dealer taking a card
-bool dealerDrow(std::shared_ptr<Dealer>& dealer,std::shared_ptr<Player>& player,std::vector<std::unique_ptr<Card>>& cards);
+bool dealerDrow(Dealer *&dealer,Player *&player,std::vector<std::unique_ptr<Card>>& cards);
 
 // Did on the first round the player got blackjack?
-bool gotBlackJack(std::shared_ptr<Player>& player,std::shared_ptr<Dealer>& dealer,std::vector<std::unique_ptr<Card>>& cards);
+bool gotBlackJack(Player *&player,Dealer *&dealer,std::vector<std::unique_ptr<Card>>& cards);
 
 // Resting the game
 bool antherRound();

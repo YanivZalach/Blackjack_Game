@@ -104,9 +104,7 @@ int Player::maxSum(){
 }
 
 // Method to add a new card to the player's hand
-void Player::addValueCard( std::unique_ptr<Card>& card_in){
-	// Adding the card to the player hand - moving the pointer
-    this->cards.push_back( std::move(card_in));
+void Player::addValueCard( std::unique_ptr<Card> card_in){
 
 	// The vector of the sums
      std::vector<int> sums_vector = this->getSums();
@@ -133,6 +131,9 @@ void Player::addValueCard( std::unique_ptr<Card>& card_in){
 
     //removing duplicates for faster use
     uniqeValuesOnlyVector(sums_vector);
+
+	// Adding the card to the player hand - moving the pointer - doing this in the end for no 'Address boundary error'
+    this->cards.push_back( std::move(card_in));
 }
 
 // --------- Dealer Class ---------
@@ -146,11 +147,11 @@ Dealer:: Dealer():Player(){
 
 
 // Method to add a new card to the dealer's hand
-void Dealer::addValueDealer( std::unique_ptr<Card>& card_in){
+void Dealer::addValueDealer( std::unique_ptr<Card> card_in){
     // Subtract the value of the new card from the sum of remaining cards to the eyes of the dealer
     this->count_remaining_cards-=card_in->values[0];
     // Add the new card to the dealer's hand using the addValueCard method of the player class
-    addValueCard(card_in);
+    addValueCard(std::move(card_in));
 }
 
 // Method to calculate the average card value in the deck

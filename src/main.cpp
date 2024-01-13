@@ -9,28 +9,33 @@
 
 int main() {
 
-    do{
+	do{
 		clearConsole(); // Clearing the console
 
-        // Creating a shuffled deck of cards
-        std::vector<std::unique_ptr<Card>> cards = shffelDeakOfCards();
+		// Creating a shuffled deck of cards
+		std::vector<std::unique_ptr<Card>> cards = shffelDeakOfCards();
 
-        // Crating a dealer and a player as a shared pointer
-        std::shared_ptr<Dealer> dealer = std::make_shared<Dealer>();
-        std::shared_ptr<Player> player = std::make_shared<Player>();
+		// Crating a dealer and a player as a shared pointer
+		Dealer *dealer = new Dealer();
+		Player *player = new Player();
 
-        startGame(player,dealer,cards);  // Starting the game
+		startGame(player,dealer,cards);  // Starting the game
 
-        printGameStatus( player, dealer);  // Printing the game status
+		printGameStatus( player, dealer);  // Printing the game status
 
-        // Taking anther card
-        if(cardGameTake(player,dealer,cards)){
-            printEndGame(player,dealer);  // If both not taking card - end game
-        }
+		// Taking anther card
+		if(cardGameTake(player,dealer,cards)){
+			printEndGame(player,dealer);  // If both not taking card - end game
+		}
 
-    }while(antherRound());  // Playing anther round?
+		// Realising the memory
+		delete dealer;
+		delete player;
 
-    std::cout<<"Thanks for playing"<<std::endl;
+	}while(antherRound());  // Playing anther round?
 
-    return 0;
+
+	std::cout<<"Thanks for playing"<<std::endl;
+
+	return 0;
 }
