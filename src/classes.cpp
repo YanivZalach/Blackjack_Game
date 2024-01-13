@@ -44,7 +44,7 @@ std::vector<int>& Player::getSums(){
     return this->sums;
 }
 
-// Method to get reference to a vector that is containing all the currant player cards that are shown
+// Method to get the sum of all the open cards of the player
 int Player::getShowCardsSum(){
 	// Creating a counter to sum all the show cards
 	int show_sum;

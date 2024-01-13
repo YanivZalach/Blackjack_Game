@@ -31,7 +31,8 @@ const int LOSTLIMIT = 21;// If Hend > lostLimit -> Lost the game
 // --------- Cards Not Shown ---------
 const int CARDSNOTSHOWN = 1;
 
-
+// --------- Opening Game Cards ---------
+const int OPENINGGAMECARDS = 2;
 
 //-------------------------------------------------- 
 // --------- Structs ---------
@@ -68,8 +69,7 @@ class Player
 
         Player();  // Constructor
         std::vector<int>& getSums();  // Method to get all the sums of the player's card values
-		int getShowCardsSum();  // Method to get reference to a vector that is containing all the currant player cards that are shown
-
+		int getShowCardsSum();  // Method to get the sum of all the open cards of the player
         void printCards();  // Method to print all of the user cards
         void printShowCard();  // Printing the opened cards
 
