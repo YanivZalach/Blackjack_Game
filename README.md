@@ -1,6 +1,6 @@
 # Blackjack Game in C++
 
-Welcome to my C++ project Blackjack Game! This project implements a console-based Blackjack game using C++.
+Welcome to my C++ Blackjack Game Project! This project implements a console-based Blackjack game using C++.
 
 ## Table of Contents
 
