@@ -25,7 +25,7 @@ This project is a classic implementation of the popular Blackjack card game in C
 
 ## Installation
 
-No external libraries or dependencies are required for this project. Just clone the repository and compile the code to get started.
+No external libraries or dependencies are required for this project. Just clone the repository and compile(`make` and `g++`) the code to get started.
 
 1. Clone this repository to your local machine.
    ```bash
