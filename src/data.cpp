@@ -7,6 +7,7 @@
 #include "classes.h"
 #include "data.h"
 
+// Creating the deck of cards
 std::vector<std::unique_ptr<Card>> crateDeakOfCards(){
 
     std::vector<std::unique_ptr<Card>> deak;
@@ -28,6 +29,7 @@ std::vector<std::unique_ptr<Card>> crateDeakOfCards(){
     return deak;
 }
 
+// Creating a shuffled deck of cards
 std::vector<std::unique_ptr<Card>> shffelDeakOfCards(){
 	srand(time(NULL));// Creating the seed for random shuffle
 

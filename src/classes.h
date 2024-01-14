@@ -11,7 +11,7 @@
 // How match is the dealer going to bet his cards; the smaller the lesser
 const double DEALERLOSSHEND = 0.95;
 // Limits
-const int LOWLIMIT = 11;  // If lowLimit >= dealerHead -> Taking card
+const int LOWLIMIT = 12;  // If lowLimit >= dealerHead -> Taking card
 const int HIGHLIMIT = 18;  // If highLimit <= dealerHead -> Not taking card
 
 // --------- Deck Const ---------

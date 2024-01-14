@@ -15,11 +15,13 @@
 const int CHACKLIMIT = 10;
 
 // Sleep time for the game
-const int LONGSLEEP = 3500;
-const int SHORTSLEEP = 2000;
+const int SLEEP = 3;
 
 //-------------------------------------------------- 
 // --------- Functions ---------
+
+// Function to pause the program
+void timer();
 
 // Function to clear the console
 void clearConsole();
@@ -27,8 +29,8 @@ void clearConsole();
 // Printing the status of the game
 void printGameStatus(Player *&player,Dealer *&dealer);
 
-// Printing the status in the end of the game
-void printEndGame(Player *&player,Dealer *&dealer);
+// Printing the status in the end of the game, 1 = player won, 0 = dealer won, -1 = both lost
+int printEndGame(Player *&player,Dealer *&dealer);
 
 // Starting the game, card handling
 void startGame(Player *&player,Dealer *&dealer,std::vector<std::unique_ptr<Card>>& cards);

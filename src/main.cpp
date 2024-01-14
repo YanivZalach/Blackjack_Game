@@ -9,6 +9,10 @@
 
 int main() {
 
+	// The game score
+	int player_won = 0;
+	int dealer_won = 0;
+
 	do{
 		clearConsole(); // Clearing the console
 
@@ -25,12 +29,33 @@ int main() {
 
 		// Taking anther card
 		if(cardGameTake(player,dealer,cards)){
-			printEndGame(player,dealer);  // If both not taking card - end game
+			switch (printEndGame(player,dealer)){ // If both not taking card - end game 
+				case 1:  // Player won this round
+					player_won++;
+					break;
+				case 0:  // Dealer won this round
+					dealer_won++;
+					break;
+			} 
+		} else {  // In the case of a blackjack
+			if (player->maxSum() == LOSTLIMIT) {
+				if (dealer->maxSum() == LOSTLIMIT) {
+					dealer_won++;  // Both got a blackjack
+				}
+					player_won++;
+			} else {
+					dealer_won++;
+			}
 		}
 
 		// Realising the memory
 		delete dealer;
 		delete player;
+
+		// Printing the currant resoles
+		std::cout<<"\n----- Score -----"<<std::endl;
+		std::cout<<"You : Dealer"<<std::endl;
+		std::cout<<player_won<<" : "<<dealer_won<<"\n"<<std::endl;
 
 	}while(antherRound());  // Playing anther round?
 

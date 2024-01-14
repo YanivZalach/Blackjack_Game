@@ -95,7 +95,7 @@ int Player::maxSum(){
 	 // Sorting for vector
     std::sort(sums_max_sum.begin(), sums_max_sum.end()); 
     //  If there is more then one we will find the max one
-	for (size_t i = sums_max_sum.size() - 1 ; i > 0; i--) {
+	for (int i = static_cast<int>(sums_max_sum.size()) - 1; i >= 0; i--) {
         if(sums_max_sum[i] <= LOSTLIMIT){
             return sums_max_sum[i];
         }
@@ -107,7 +107,7 @@ int Player::maxSum(){
 void Player::addValueCard( std::unique_ptr<Card> card_in){
 
 	// The vector of the sums
-     std::vector<int> sums_vector = this->getSums();
+     std::vector<int>& sums_vector = this->getSums();
 
     // Update all the sums combinations
     bool is_a = (card_in->symbol=='A');  // is the card an A?

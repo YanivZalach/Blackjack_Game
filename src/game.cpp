@@ -4,10 +4,18 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <thread>  // For the timer
+#include <chrono>
+
 
 #include "classes.h"
 #include "game.h"
 
+// Stopping the program for game effect
+void timer(){
+	// Pause for SLEEP seconds
+    std::this_thread::sleep_for(std::chrono::seconds(SLEEP));
+}
 // Function to clear the console
 void clearConsole(){
 	// Clear the console - ANSI escape codes are supported by many terminal emulators, making them relatively portable.
@@ -27,6 +35,7 @@ void printGameStatus(Player *&player, Dealer *&dealer) {
 	}
 
 	if (dealer) {
+
 		std::cout << "The dealer's open card:";
 		dealer->printShowCard();
 	}
@@ -34,12 +43,16 @@ void printGameStatus(Player *&player, Dealer *&dealer) {
 
 
 // Printing the status in the end of the game
-void printEndGame(Player *&player,Dealer *&dealer){
+int printEndGame(Player *&player,Dealer *&dealer){
 
 	clearConsole();  // Clearing the console
 
 	std::cout<<"Showing the cards!"<<std::endl;
 
+	if (player) {  // The player cards
+		std::cout<<"You got: "<<std::endl;
+		player->printCards();
+	}
 	if (dealer) {  // The dealer cards
 		std::cout<<"The dealer got: "<<std::endl;
 		dealer->printCards();
@@ -53,15 +66,17 @@ void printEndGame(Player *&player,Dealer *&dealer){
 			// the dealer is wining in a tie
 			std::cout<<"THE HOUSE WINS IN A TIE"<<std::endl;
 		}
+		return 0;
 	}
 	else if(player->maxSum()<=LOSTLIMIT){
 		// We got here - the dealer lost, if the player is in limit he won
 		std::cout<<"YOU WON THE GAME!!!"<<std::endl;
+		return 1;
 	}
-	else{
-		// The player is not in the limit - both lost
-		std::cout<<"You have both lost..."<<std::endl;
-	}
+	// The player is not in the limit - both lost
+	std::cout<<"You have both lost..."<<std::endl;
+	return -1;
+
 }
 
 // The opening of the game
@@ -79,31 +94,44 @@ void startGame(Player *&player,Dealer *&dealer,std::vector<std::unique_ptr<Card>
 		cards.pop_back();  // Removing it
 		dealer->addValueDealer(std::move(hold_dealer));  // Inserting the last element
 	}
-	//addtimer
+	// Timer
+	timer();
 }
 
 // Taking cards in the game rounds
 bool cardGameTake(Player *&player,Dealer *&dealer,std::vector<std::unique_ptr<Card>>& cards){
+	if(gotBlackJack(player,dealer,cards)){  // Got blackjack on the start?
+		std::cout << "The dealer's card:";
+		dealer->printCards();
+		return false;
+	}
 	// If the player had ended to take cards
 	bool player_want_to_drow = true;
 	bool dealer_want_to_drow = true;
-	int i =0;//making shore we dont pass chackLimit
+	int i = 0;// For not passing the CHACKLIMIT
 	while ((player_want_to_drow||dealer_want_to_drow)&&(CHACKLIMIT>i))
 	{
-		if(gotBlackJack(player,dealer,cards)){
-			return false;
-		}
-		//printing the round
+		// Printing the round
 		std::cout<<"Round "<<(i+3)<<std::endl;//i starts from 0, and we have 2 cards
+
 		if(player_want_to_drow ==true){
 			player_want_to_drow = playerDrow(player,cards);
 		}
 		if(dealer_want_to_drow ==true){
 			dealer_want_to_drow = dealerDrow(dealer, player,cards);
 		}
-		//time to read - addtimer
+
+		if(gotBlackJack(player,dealer,cards)){  // Got blackjack?
+												// The dealer info - wont see it else
+
+			std::cout << "The dealer's card:";
+			dealer->printCards();
+			return false;
+		}
+		// Timer
+		timer();
 		printGameStatus( player, dealer);
-		i++;//incresing i
+		i++;// Increasing the round counter
 	}
 	return true;
 }
@@ -150,21 +178,24 @@ bool gotBlackJack(Player *&player,Dealer *&dealer,std::vector<std::unique_ptr<Ca
 	// Both
 	if(dealer->maxSum()==LOSTLIMIT && player->maxSum()==LOSTLIMIT){
 		std::cout<<"WHIT!"<<std::endl;
-		// Addtimer
+		// Timer
+		timer();
 		std::cout<<"YOU BOTH GOT A BLACKJACK!!!"<<std::endl;
 		return true;
 	}
 	// Player only
 	if(player->maxSum() == LOSTLIMIT){
 		std::cout<<"WHIT!"<<std::endl;
-		// addtimer
+		// Timer
+		timer();
 		std::cout<<"YOU WIN, YOU GOT A BLACKJACK!!!"<<std::endl;
 		return true;
 	}
 	//dealer
 	if(dealer->maxSum()==LOSTLIMIT){
 		std::cout<<"WHIT!"<<std::endl;
-		// Addtimer
+		// Timer
+		timer();
 		std::cout<<"YOU LOST, THE DEALER GOT A BLACKJACK!!!"<<std::endl;
 		return true;
 	}
@@ -185,3 +216,7 @@ bool antherRound(){
 	// Exit the program
 	return false;
 }
+
+
+
+
