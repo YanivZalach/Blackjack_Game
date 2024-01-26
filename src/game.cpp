@@ -142,6 +142,7 @@ bool playerDrow(Player *&player,std::vector<std::unique_ptr<Card>>& cards){
 	char input_take_card;
 	std::cout<<"Take anther card?"<<'\n'<<"(y=take/N=stop)"<<std::endl;
 	std::cin>>input_take_card;
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Clearing the input buffer
 
 	// Taking a card
 	if(input_take_card=='y'||input_take_card=='Y'){
@@ -209,6 +210,7 @@ bool antherRound(){
 	std::cout<<"Anther round(y/N)?"<<std::endl;
 	char run;
 	std::cin >> run;
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Clearing the input buffer
 	// A new game
 	if(run == 'y'|| run =='Y'){
 		return true;
